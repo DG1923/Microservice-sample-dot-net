@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: command-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: commandservice
+  template:
+    metadata:
+      labels:
+        app: commandservice
+    spec:
+      containers:
+        - name: platformservice
+          image: dgiap/commandservice:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: commandservice-cluster-ip-srv
+spec:
+  type: ClusterIP
+  selector:
+    app: commandservice
+  ports:
+  - protocol: TCP
+    port : 8080
+    targetPort: 8080
