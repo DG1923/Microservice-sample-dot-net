@@ -1,45 +1,111 @@
-This is a project follow tutorial on youtube 
-# deploy kubernetes 
-kubectl apply -f platform-depl.yaml
+# Microservices Project with Kubernetes
 
-# Get deployments in kubernetes
-kubectl get deployments
+## Prerequisites
+- Docker Desktop with Kubernetes enabled
+- kubectl CLI
+- SQL Server
+- RabbitMQ
 
-# Get pods in kubernetes
-kubectl get pods
+## Setup Steps
 
-# Get services in kubernetes
-kubectl get services
-
-# kill the deployment
-kubectl delete deployment platform-depl
-kubectl delete deployment command-depl
-
-# restart the deployment
-kubectl rollout restart deployment platform-depl
-
-# install ingress nginx 
+### 1. Install Ingress Controller
+```bash
+# Install NGINX Ingress Controller
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.1/deploy/static/provider/cloud/deploy.yaml
-# get pods as namespace = ingress-nginx
+
+# Verify installation
 kubectl get pods -n ingress-nginx
-
-# get services as namespace = ingress-nginx
 kubectl get services -n ingress-nginx
+```
 
-# deploy the ingress service
-kubectl apply -f ingress-srv.yaml
-
-# deploy sql server
-kubectl apply -f local_pvc.yaml
-
-# create account for sql server
+### 2. Deploy SQL Server
+```bash
+# Create SQL Server credentials
 kubectl create secret generic mssql --from-literal=SA_PASSWORD="Abc123!@#"
 
-# Deployment commands
-kubectl rollout restart deployment platform-depl    # Restart a deployment
-kubectl rollout status deployment platform-depl     # Check rollout status
-kubectl rollout history deployment platform-depl    # View rollout history
+# Deploy SQL Server with persistent volume
+kubectl apply -f local_pvc.yaml
+```
 
-# Verify deployment
-kubectl get deployments                            # List all deployments
-kubectl get pods                                   # Check if pods are running
+### 3. Deploy RabbitMQ
+```bash
+# Deploy RabbitMQ message broker
+kubectl apply -f rabbitmq-depl.yaml
+```
+
+### 4. Deploy Microservices
+```bash
+# Deploy Platform Service
+kubectl apply -f platform-depl.yaml
+
+# Deploy Commands Service
+kubectl apply -f command-depl.yaml
+
+# Deploy Ingress rules
+kubectl apply -f ingress-srv.yaml
+```
+
+## Useful Commands
+
+### Deployment Management
+```bash
+# List all deployments
+kubectl get deployments
+
+# List all pods
+kubectl get pods
+
+# List all services
+kubectl get services
+```
+
+### Deployment Operations
+```bash
+# Restart a deployment
+kubectl rollout restart deployment platform-depl
+
+# Check deployment status
+kubectl rollout status deployment platform-depl
+
+# View deployment history
+kubectl rollout history deployment platform-depl
+```
+
+### Delete Deployments
+```bash
+# Remove platform deployment
+kubectl delete deployment platform-depl
+
+# Remove command deployment
+kubectl delete deployment command-depl
+```
+
+## Troubleshooting
+
+### Check Resources
+```bash
+# Check pod status
+kubectl get pods
+
+# Check pod logs
+kubectl logs <pod-name>
+
+# Describe pod details
+kubectl describe pod <pod-name>
+```
+
+### Check Services
+```bash
+# List all services
+kubectl get services
+
+# Check ingress status
+kubectl get ingress
+```
+
+## Architecture
+- Platform Service: Manages platform data
+- Commands Service: Handles command processing
+- SQL Server: Primary database
+- RabbitMQ: Message broker for async communication
+- NGINX Ingress: API Gateway and routing
